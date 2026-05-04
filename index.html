@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A personal AI agent in 451 lines of Python. Auditable, impartial, made in Singapore.">
+<meta property="og:title" content="kayaclaw">
+<meta property="og:description" content="A personal AI agent in 451 lines of Python. Auditable, impartial, made in Singapore.">
+<meta property="og:image" content="assets/kayaclaw-social.jpg">
+<meta property="og:type" content="website">
+<title>kayaclaw</title>
+<link rel="icon" type="image/png" href="assets/kayaclaw-logo.png">
+<style>
+:root {
+  --pandan: #7CB342;
+  --toast: #C68642;
+  --butter: #FFF3C4;
+  --chili: #E55934;
+  --bg: #F7F2E4;
+  --bg-card: #FFFCF1;
+  --bg-warm: #EFE6CD;
+  --bg-dark: #14130f;
+  --ink: #1A1812;
+  --soft: rgba(26, 24, 18, 0.72);
+  --mute: rgba(26, 24, 18, 0.45);
+  --line: rgba(26, 24, 18, 0.14);
+  --line-soft: rgba(26, 24, 18, 0.06);
+  --pandan-d: #6FA13A;
+  --toast-d: #B27A38;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14130f;
+    --bg-card: #1c1a15;
+    --bg-warm: #1f1c16;
+    --ink: #ECE7DA;
+    --soft: rgba(236, 231, 218, 0.72);
+    --mute: rgba(236, 231, 218, 0.45);
+    --line: rgba(236, 231, 218, 0.14);
+    --line-soft: rgba(236, 231, 218, 0.06);
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-underline-offset: 3px; text-decoration-color: var(--line); }
+a:hover { text-decoration-color: var(--chili); }
+
+/* Nav */
+.nav { display: flex; align-items: center; gap: 32px; padding: 14px 48px; border-bottom: 1px solid var(--line-soft); background: var(--bg); position: sticky; top: 0; z-index: 30; }
+.mark { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.mark img { width: 30px; height: 30px; }
+.mark-name { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--ink); }
+.mark-ver { color: var(--mute); font-weight: 400; margin-left: 4px; }
+.nav-links { display: flex; gap: 22px; flex: 1; font-family: var(--font-mono); font-size: 13px; list-style: none; padding: 0; margin: 0; }
+.nav-links a { color: var(--soft); text-decoration: none; }
+.nav-links a:hover { color: var(--chili); }
+.nav-gh { display: inline-flex; align-items: center; gap: 8px; padding: 7px 13px; border: 1px solid var(--line); border-radius: 999px; font-family: var(--font-mono); font-size: 12.5px; text-decoration: none; color: var(--soft); background: var(--bg-card); }
+.nav-gh:hover { color: var(--ink); }
+.nav-gh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pandan); box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.25); }
+@media (max-width: 720px) { .nav-links { display: none; } .nav { padding: 12px 24px; } }
+
+/* Hero */
+.hero { position: relative; overflow: hidden; }
+.hero-grain { position: absolute; inset: 0; background: radial-gradient(ellipse at top right, rgba(124, 179, 66, 0.12), transparent 55%), radial-gradient(ellipse at bottom left, rgba(198, 134, 66, 0.10), transparent 60%); pointer-events: none; }
+.hero-inner { position: relative; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: center; max-width: 1180px; margin: 0 auto; padding: 80px 48px 100px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--mute); margin: 0 0 26px; }
+.eb-tag { color: var(--chili); font-weight: 600; }
+.eb-sep { opacity: 0.4; }
+.h1 { font-family: var(--font-serif); font-size: clamp(44px, 5.6vw, 76px); line-height: 1.0; letter-spacing: -0.025em; margin: 0 0 26px; font-weight: 500; }
+.h1-line { display: block; }
+.h1 em { font-style: italic; color: var(--chili); }
+.lede { font-size: 18px; line-height: 1.55; color: var(--soft); margin: 0 0 30px; max-width: 540px; }
+.lede strong { color: var(--ink); font-weight: 600; }
+.ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 36px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 999px; font-size: 14px; font-weight: 500; text-decoration: none; border: 1px solid transparent; }
+.btn.primary { background: var(--chili); color: #fff; }
+.btn.primary:hover { background: #d34a26; }
+.btn.ghost { border-color: var(--line); color: var(--ink); background: var(--bg-card); }
+.btn.ghost:hover { border-color: var(--mute); }
+.btn svg { width: 14px; height: 14px; fill: currentColor; }
+.pillars { list-style: none; padding: 22px 0 0; margin: 0; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
+.pillars li { display: flex; align-items: center; gap: 11px; font-size: 14px; color: var(--soft); }
+.pillars strong { color: var(--ink); font-weight: 600; }
+.pill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.hero-art { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.logo-card { width: 100%; max-width: 420px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: var(--bg-card); box-shadow: 0 18px 40px rgba(80, 50, 20, 0.10); }
+.logo-stage { position: relative; aspect-ratio: 1.05; display: grid; place-items: center; padding: 28px; background: radial-gradient(circle at 30% 28%, var(--butter), transparent 60%), radial-gradient(circle at 75% 78%, rgba(124, 179, 66, 0.18), transparent 55%), linear-gradient(160deg, #FFF6D8, #F1E5BD); }
+.logo-stage img { position: relative; z-index: 1; max-width: 78%; max-height: 78%; filter: drop-shadow(0 16px 24px rgba(50, 30, 15, 0.18)); }
+.logo-meta { padding: 16px 20px; border-top: 1px solid var(--line); }
+.logo-meta p { display: grid; grid-template-columns: 64px 1fr; gap: 12px; margin: 0; padding: 5px 0; font-family: var(--font-mono); font-size: 12px; }
+.logo-meta p + p { border-top: 1px dashed var(--line-soft); }
+.logo-key { color: var(--mute); }
+.art-note { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 11px; color: var(--mute); margin: 0; max-width: 380px; line-height: 1.4; }
+.art-rule { display: inline-block; width: 28px; height: 1px; background: var(--mute); flex-shrink: 0; }
+@media (max-width: 880px) { .hero-inner { grid-template-columns: 1fr; gap: 40px; padding: 56px 24px 72px; } .hero-art { order: -1; } }
+
+/* Sections */
+.section { max-width: 1180px; margin: 0 auto; padding: 88px 48px; border-top: 1px solid var(--line); }
+@media (max-width: 720px) { .section { padding: 64px 24px; } }
+.sec-head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; max-width: 760px; }
+.kicker { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 12px; color: var(--chili); margin: 0; font-weight: 600; }
+.sec-head h2 { font-family: var(--font-serif); font-size: clamp(28px, 4vw, 42px); line-height: 1.1; letter-spacing: -0.02em; margin: 0; font-weight: 500; }
+.sub { font-size: 16px; color: var(--soft); margin: 4px 0 0; max-width: 600px; }
+
+/* What */
+.caps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; list-style: none; padding: 0; margin: 0; }
+.cap { padding: 26px 24px 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-card); display: flex; flex-direction: column; gap: 8px; }
+.cap-num { font-family: var(--font-mono); font-size: 12px; color: var(--mute); }
+.cap h3 { font-family: var(--font-serif); font-size: 21px; font-weight: 500; margin: 0; }
+.cap p { margin: 0; color: var(--soft); font-size: 14.5px; flex: 1; }
+.cap-tag { font-family: var(--font-mono); font-size: 11.5px; color: var(--toast-d); margin-top: 8px; padding-top: 10px; border-top: 1px dashed var(--line-soft); }
+@media (max-width: 720px) { .caps { grid-template-columns: 1fr; } }
+
+/* Why */
+.prose { max-width: 700px; font-size: 19px; line-height: 1.65; color: var(--ink); }
+.prose p { margin: 0 0 1em; }
+.sig { display: flex; align-items: center; gap: 12px; font-family: var(--font-mono); font-size: 13px; color: var(--mute); margin-top: 24px; }
+.sig-rule { display: inline-block; width: 32px; height: 1px; background: var(--toast-d); }
+
+/* Code window */
+.window { background: var(--bg-dark); color: #f4ead0; border-radius: 14px; overflow: hidden; border: 1px solid rgba(26, 24, 18, 0.18); box-shadow: 0 18px 40px rgba(50, 30, 15, 0.14); }
+.window-head { display: flex; align-items: center; gap: 14px; padding: 9px 12px; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.dots { display: inline-flex; gap: 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; }
+.dots i:nth-child(1) { background: #ff5f57; }
+.dots i:nth-child(2) { background: #febc2e; }
+.dots i:nth-child(3) { background: #28c841; }
+.window-title { flex: 1; font-family: var(--font-mono); font-size: 12px; color: rgba(244, 234, 208, 0.55); text-align: center; }
+.window-body { margin: 0; padding: 22px 24px 26px; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.85; white-space: pre; overflow-x: auto; color: #f4ead0; }
+.window.small .window-body { font-size: 12.5px; padding: 18px 20px; }
+.pp { color: #9CCC65; user-select: none; }
+.l-cmt { color: rgba(244, 234, 208, 0.45); }
+.l-out { color: rgba(244, 234, 208, 0.7); }
+.ok-dot { color: #9CCC65; }
+.copy-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; padding: 5px 9px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.12); background: transparent; color: rgba(244, 234, 208, 0.6); }
+.copy-btn:hover { color: #f4ead0; border-color: rgba(255, 255, 255, 0.22); }
+.copy-btn svg { width: 12px; height: 12px; fill: currentColor; }
+.fineprint { font-family: var(--font-mono); font-size: 12.5px; color: var(--mute); margin: 18px 0 0; }
+.fineprint a { color: var(--chili); text-decoration: none; }
+
+/* Verify */
+.verify-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 36px; align-items: start; }
+.verify-title { font-family: var(--font-mono); font-size: 11.5px; color: var(--mute); margin: 0 0 14px; letter-spacing: 0.04em; }
+.verify-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 11px; font-size: 15px; }
+.verify-list li { display: flex; align-items: center; gap: 10px; }
+.vchk { color: var(--pandan-d); font-weight: 700; flex-shrink: 0; }
+.vmore { color: var(--mute); padding-top: 12px; border-top: 1px solid var(--line-soft); margin-top: 4px; font-size: 14px; }
+@media (max-width: 720px) { .verify-grid { grid-template-columns: 1fr; } }
+
+/* CTA grid */
+.cta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.cta-card { display: flex; flex-direction: column; gap: 10px; padding: 26px 24px 22px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg-card); text-decoration: none; color: var(--ink); }
+.cta-card:hover { border-color: var(--chili); }
+.cta-icon { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: rgba(229, 89, 52, 0.12); color: var(--chili); margin-bottom: 4px; }
+.cta-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.cta-card h3 { font-family: var(--font-serif); font-size: 20px; font-weight: 500; margin: 0; }
+.cta-card p { margin: 0; color: var(--soft); font-size: 14px; flex: 1; }
+.cta-link { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 11.5px; color: var(--mute); margin-top: 8px; }
+@media (max-width: 720px) { .cta-grid { grid-template-columns: 1fr; } }
+
+/* Footer */
+.foot { background: var(--bg-warm); border-top: 1px solid var(--line); margin-top: 80px; }
+.foot-row { max-width: 1180px; margin: 0 auto; padding: 48px 48px 28px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 48px; }
+.foot-mark { display: flex; align-items: center; gap: 12px; }
+.foot-mark img { width: 42px; height: 42px; }
+.foot-name { font-family: var(--font-serif); font-size: 22px; font-weight: 500; margin: 0 0 2px; }
+.foot-by { font-family: var(--font-mono); font-size: 12px; color: var(--mute); margin: 0; }
+.foot-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.foot-cols h5 { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--mute); margin: 0 0 12px; text-transform: lowercase; }
+.foot-cols ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; font-size: 14px; }
+.foot-cols a { color: var(--soft); text-decoration: none; }
+.foot-cols a:hover { color: var(--chili); }
+.foot-base { max-width: 1180px; margin: 0 auto; padding: 22px 48px 44px; display: flex; gap: 18px; align-items: center; border-top: 1px solid var(--line); }
+.foot-thumb { position: relative; width: 110px; height: 64px; border-radius: 8px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--line); }
+.foot-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.foot-thumb-tag { position: absolute; bottom: 4px; left: 6px; font-family: var(--font-mono); font-size: 9.5px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+.foot-note { font-family: var(--font-mono); font-size: 12px; color: var(--mute); margin: 0; line-height: 1.55; max-width: 640px; }
+@media (max-width: 720px) { .foot-row { grid-template-columns: 1fr; gap: 24px; padding: 36px 24px 20px; } .foot-cols { grid-template-columns: 1fr 1fr; } .foot-base { flex-direction: column; align-items: flex-start; padding: 20px 24px 36px; } }
+</style>
+</head>
+<body>
+
+<header class="nav" role="banner">
+  <a class="mark" href="#top" aria-label="kayaclaw home">
+    <img src="assets/kayaclaw-logo.png" alt="">
+    <span class="mark-name">kayaclaw<span class="mark-ver">/v0.1.0</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#what">what</a></li>
+    <li><a href="#why">why</a></li>
+    <li><a href="#start">quick start</a></li>
+    <li><a href="#verify">verify</a></li>
+  </ul>
+  <a class="nav-gh" href="https://github.com/kayaclaw/kayaclaw">
+    <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    <span>github</span>
+    <span class="nav-gh-dot" aria-hidden="true"></span>
+  </a>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <p class="eyebrow">
+        <span class="eb-tag">~/</span>
+        <span>a personal AI agent</span>
+        <span class="eb-sep">·</span>
+        <span>singapore, 2026</span>
+      </p>
+      <h1 class="h1">
+        <span class="h1-line">Small enough to read</span>
+        <span class="h1-line">over <em>kaya toast</em>.</span>
+      </h1>
+      <p class="lede">
+        kayaclaw is a personal AI agent in <strong>451 lines of Python</strong>.
+        It runs in a hardened Docker container, talks to you on Telegram, and
+        points at whichever LLM provider you trust today.
+      </p>
+      <div class="ctas">
+        <a class="btn primary" href="https://github.com/kayaclaw/kayaclaw">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          <span>View on GitHub</span>
+        </a>
+        <a class="btn ghost" href="#start">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25ZM7.25 8a.74.74 0 0 1-.22.53l-2.25 2.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L5.44 8 3.72 6.28a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215l2.25 2.25c.141.14.22.331.22.53Zm1.5 1.5h3a.75.75 0 0 1 0 1.5h-3a.75.75 0 0 1 0-1.5Z"/></svg>
+          <span>Quick start</span>
+        </a>
+      </div>
+      <ul class="pillars">
+        <li><span class="pill-dot" style="background: #E55934"></span><span><strong>auditable.</strong> small enough to read in an afternoon.</span></li>
+        <li><span class="pill-dot" style="background: #7CB342"></span><span><strong>impartial.</strong> no SDK lock-in to any single provider.</span></li>
+        <li><span class="pill-dot" style="background: #C68642"></span><span><strong>made in singapore.</strong> small like singapore.</span></li>
+      </ul>
+    </div>
+    <div class="hero-art">
+      <div class="logo-card">
+        <div class="logo-stage">
+          <img src="assets/kayaclaw-logo.png" alt="kayaclaw mascot, a chili crab holding a slice of kaya toast">
+        </div>
+        <div class="logo-meta">
+          <p><span class="logo-key">name</span><span>kayaclaw</span></p>
+          <p><span class="logo-key">means</span><span>kaya (jam) + claw (crab)</span></p>
+          <p><span class="logo-key">family</span><span>claw projects, clean-room build</span></p>
+        </div>
+      </div>
+      <p class="art-note">
+        <span class="art-rule"></span>
+        <span>brand artwork generated with Google Gemini Nano Banana. disclosed in NOTICES.md.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="what">
+  <header class="sec-head">
+    <p class="kicker">$ what it does</p>
+    <h2>Three moving parts. That is the whole agent.</h2>
+  </header>
+  <ul class="caps">
+    <li class="cap">
+      <div class="cap-num">01</div>
+      <h3>Telegram interface</h3>
+      <p>You chat with the agent through your own Telegram bot. No web app to host, no front-end to maintain.</p>
+      <p class="cap-tag">interface · ~80 lines</p>
+    </li>
+    <li class="cap">
+      <div class="cap-num">02</div>
+      <h3>SQLite memory</h3>
+      <p>Conversations live in one SQLite file on disk. Inspect it, back it up, or delete it with rm.</p>
+      <p class="cap-tag">storage · 1 file</p>
+    </li>
+    <li class="cap">
+      <div class="cap-num">03</div>
+      <h3>Swap any provider</h3>
+      <p>Point it at DeepInfra, OpenRouter, Groq, DeepSeek, Qwen, or any OpenAI-compatible endpoint.</p>
+      <p class="cap-tag">router · config-driven</p>
+    </li>
+  </ul>
+</section>
+
+<section class="section" id="why">
+  <header class="sec-head">
+    <p class="kicker">$ why it exists</p>
+    <h2>A note from Anson.</h2>
+  </header>
+  <div class="prose">
+    <p>OpenClaw is a fine project, but it is too large for me to audit comfortably in one sitting. NanoClaw nails the hardening philosophy I want, except it is tied to the Claude SDK and I want to point my agent at whichever provider I trust this month.</p>
+    <p>kayaclaw is the version I wanted to read end to end before running on my own machine. 451 lines of core Python. One Dockerfile. One config file. If a claim in the README is not verifiable with a shell command, I removed the claim.</p>
+    <p class="sig"><span class="sig-rule"></span><span>anson zeall · maintainer · singapore</span></p>
+  </div>
+</section>
+
+<section class="section" id="start">
+  <header class="sec-head">
+    <p class="kicker">$ quick start</p>
+    <h2>Three commands to a running agent.</h2>
+    <p class="sub">Assumes Docker, a Telegram bot token, and an LLM API key.</p>
+  </header>
+  <div class="window">
+    <div class="window-head">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="window-title">bash · install + run</span>
+      <button class="copy-btn" data-copy="install">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
+        <span>copy</span>
+      </button>
+    </div>
+<pre class="window-body" id="install"><span class="pp">$</span> git clone https://github.com/kayaclaw/kayaclaw
+<span class="pp">$</span> cd kayaclaw &amp;&amp; cp config.example.toml config.toml
+<span class="l-cmt"># point config.toml at your provider + bot token</span>
+<span class="pp">$</span> docker compose up -d
+<span class="pp">$</span> docker logs -f kayaclaw
+<span class="l-out"><span class="ok-dot">●</span> ready. polling Telegram.</span></pre>
+  </div>
+  <p class="fineprint">The full README walks through swapping providers, persisting SQLite, and the security posture. <a href="https://github.com/kayaclaw/kayaclaw#readme">Read on GitHub →</a></p>
+</section>
+
+<section class="section" id="verify">
+  <header class="sec-head">
+    <p class="kicker">
+      <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M7.467.133a1.75 1.75 0 0 1 1.066 0l5.25 1.68A1.75 1.75 0 0 1 15 3.48V7c0 1.566-.32 3.182-1.303 4.682-.983 1.498-2.585 2.813-5.032 3.855a1.7 1.7 0 0 1-1.33 0c-2.447-1.042-4.049-2.357-5.032-3.855C1.32 10.182 1 8.566 1 7V3.48a1.75 1.75 0 0 1 1.217-1.667Z"/></svg>
+      verify
+    </p>
+    <h2>Read the posture, then check the running container.</h2>
+    <p class="sub">16 of 20 hardening controls implemented in v0.1.0. The remaining 4 are on the roadmap, not glossed over.</p>
+  </header>
+  <div class="verify-grid">
+    <div>
+      <p class="verify-title">implemented in v0.1.0</p>
+      <ul class="verify-list">
+        <li><span class="vchk">✓</span><span>read-only root filesystem</span></li>
+        <li><span class="vchk">✓</span><span>all Linux capabilities dropped</span></li>
+        <li><span class="vchk">✓</span><span>no-new-privileges security opt</span></li>
+        <li><span class="vchk">✓</span><span>non-root user inside container</span></li>
+        <li><span class="vchk">✓</span><span>tmpfs for /tmp with size cap</span></li>
+        <li><span class="vchk">✓</span><span>network isolation by default</span></li>
+        <li class="vmore">+ 10 more in <a href="https://github.com/kayaclaw/kayaclaw/blob/main/docs/discovery/container/SECURITY.md">SECURITY.md</a></li>
+      </ul>
+    </div>
+    <div class="window small">
+      <div class="window-head">
+        <span class="window-title">$ inspect the running container</span>
+        <button class="copy-btn" data-copy="inspect">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
+          <span>copy</span>
+        </button>
+      </div>
+<pre class="window-body" id="inspect"><span class="pp">$</span> docker inspect kayaclaw \
+    | jq '.[0].HostConfig | { ReadonlyRootfs, CapDrop, SecurityOpt }'
+<span class="l-out">{
+  "ReadonlyRootfs": true,
+  "CapDrop": ["ALL"],
+  "SecurityOpt": ["no-new-privileges:true"]
+}</span></pre>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="involved">
+  <header class="sec-head">
+    <p class="kicker">$ get involved</p>
+    <h2>Three ways in.</h2>
+  </header>
+  <div class="cta-grid">
+    <a class="cta-card" href="https://github.com/kayaclaw/kayaclaw">
+      <span class="cta-icon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></span>
+      <h3>Star on GitHub</h3>
+      <p>Bookmark the repo. Helps me see what people care about.</p>
+      <span class="cta-link">github.com/kayaclaw →</span>
+    </a>
+    <a class="cta-card" href="https://github.com/kayaclaw/kayaclaw/discussions">
+      <span class="cta-icon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.75 2.5h10.5c.69 0 1.25.56 1.25 1.25v8.5c0 .69-.56 1.25-1.25 1.25H8.61l-2.85 2.78A.75.75 0 0 1 4.5 15.75V13.5H2.75c-.69 0-1.25-.56-1.25-1.25v-8.5C1.5 3.06 2.06 2.5 2.75 2.5zM3 4v8h2.25a.75.75 0 0 1 .75.75v1.31l1.97-1.84a.75.75 0 0 1 .53-.22H13V4z"/></svg></span>
+      <h3>Open a Discussion</h3>
+      <p>Provider you want supported, hardening idea, design feedback.</p>
+      <span class="cta-link">Start a thread →</span>
+    </a>
+    <a class="cta-card" href="https://github.com/kayaclaw/kayaclaw/tree/main/agent">
+      <span class="cta-icon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m11.28 3.22 4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.275-.326.749.749 0 0 1 .215-.734L13.94 8l-3.72-3.72a.749.749 0 0 1 .326-1.275.749.749 0 0 1 .734.215Zm-6.56 0a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L2.06 8l3.72 3.72a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L.47 8.53a.75.75 0 0 1 0-1.06Z"/></svg></span>
+      <h3>Read the Code</h3>
+      <p>451 lines of Python. The whole agent fits in one tab.</p>
+      <span class="cta-link">Browse /agent →</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot-row">
+    <div class="foot-mark">
+      <img src="assets/kayaclaw-logo.png" alt="">
+      <div>
+        <p class="foot-name">kayaclaw</p>
+        <p class="foot-by">by anson zeall · singapore · 2026</p>
+      </div>
+    </div>
+    <div class="foot-cols">
+      <div>
+        <h5>project</h5>
+        <ul>
+          <li><a href="https://github.com/kayaclaw/kayaclaw/blob/main/LICENSE">MIT License</a></li>
+          <li><a href="https://github.com/kayaclaw/kayaclaw/blob/main/SECURITY.md">SECURITY</a></li>
+          <li><a href="https://github.com/kayaclaw/kayaclaw/blob/main/NOTICES.md">NOTICES</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>repo</h5>
+        <ul>
+          <li><a href="https://github.com/kayaclaw/kayaclaw">github.com/kayaclaw</a></li>
+          <li><a href="https://github.com/kayaclaw/kayaclaw/discussions">discussions</a></li>
+          <li><a href="https://github.com/kayaclaw/kayaclaw/issues">issues</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="foot-base">
+    <div class="foot-thumb">
+      <img src="assets/kayaclaw-social.jpg" alt="kayaclaw mascot working with the Singapore skyline">
+      <span class="foot-thumb-tag">og:image · social/</span>
+    </div>
+    <p class="foot-note">Made in Singapore. Small like Singapore. Brand artwork generated with Google Gemini Nano Banana. Full provenance in NOTICES.md.</p>
+  </div>
+</footer>
+
+<script>
+// Copy buttons. ~10 lines of vanilla JS as the brief specifies.
+document.querySelectorAll('.copy-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var src = document.getElementById(btn.getAttribute('data-copy'));
+    if (!src) return;
+    navigator.clipboard.writeText(src.innerText).then(function() {
+      var label = btn.querySelector('span');
+      var prev = label.textContent;
+      label.textContent = 'copied';
+      setTimeout(function() { label.textContent = prev; }, 1300);
+    });
+  });
+});
+</script>
+
+</body>
+</html>
